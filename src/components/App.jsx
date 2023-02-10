@@ -1,34 +1,78 @@
 import React, { Component } from 'react';
 import { ContactForm } from './ContactForm/ContactForm';
 import { ContactList } from './ContactList/ContactList';
+import { nanoid } from 'nanoid';
+import { Filter } from './Filter/Filter';
+import css from './App.module.css';
 
-
-const initialState = {
-  contacts: [ {id: 'id-1', name: 'Rosie Simpson', number: '459-12-56'},
-  {id: 'id-2', name: 'Hermione Kline', number: '443-89-12'},
-  {id: 'id-3', name: 'Eden Clements', number: '645-17-79'},
-  {id: 'id-4', name: 'Annie Copeland', number: '227-91-26'},],
-  name: ''
-}
 export class App extends Component {
+  state = {
+    contacts: [],
+    filter: '',
+  };
 
-  state = {...initialState}
+  addContact = ({ name, number }) => {
+    const normalizationName = name.toLowerCase();
 
-  handleSubmit = (evt) => {
-    
-}
+    let atContactList = false;
+    this.state.contacts.forEach(item => {
+      if (item.name.toLocaleLowerCase() === normalizationName) {
+        alert(`${name} is already in contacts.`);
+        atContactList = true;
+      }
+    });
+
+    if (atContactList) {
+      return;
+    }
+
+    const newContact = {
+      name: name,
+      number: number,
+      id: nanoid(),
+    };
+
+    this.setState(prevState => ({
+      contacts: [...prevState.contacts, newContact],
+    }));
+  };
+
+  changeFilter = e => {
+    this.setState({ filter: e.currentTarget.value });
+  };
+
+  filteredContacts = () => {
+    const { filter, contacts } = this.state;
+    const normalizedCase = filter.toLowerCase();
+
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedCase)
+    );
+  };
+
+  deleteContactItem = itemId => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== itemId),
+    }));
+  };
 
   render() {
     return (
-      <div>
-  <h1>Phonebook</h1>
- <ContactForm  onSubmit={this.handleSubmit} />
+      <div className={css.phonebook}>
+        <h1>Phonebook</h1>
+        <ContactForm onSubmit={this.addContact} />
 
-  <h2>Contacts</h2>
-  {/* <Filter  />
-   */}
-   <ContactList contacts = {this.state.contacts}  />
-</div>
-    )
+        <h2>Contacts</h2>
+        {this.state.contacts.length > 0 && (
+          <div>
+            <Filter value={this.state.filter} onChange={this.changeFilter} />
+            <ContactList
+              contacts={this.filteredContacts()}
+              onDelete={this.deleteContactItem}
+            />
+          </div>
+        )}
+      </div>
+    );
   }
 }

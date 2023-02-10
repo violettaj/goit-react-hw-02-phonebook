@@ -1,9 +1,21 @@
-export const ContactListElement = ({name}) => {
+import css from './ContactListElement.module.css';
+import PropTypes from 'prop-types';
+
+export const ContactListElement = ({ id, name, number, onDelete }) => {
   return (
-    <li >
-      <p>{name}</p>
+    <li className={css.item}>
+      <p>
+        {name}: {number}{' '}
+      </p>
+      <button className={css.delete} type="button" onClick={() => onDelete(id)}>
+        Delete
+      </button>
     </li>
   );
 };
 
-
+ContactListElement.propTypes = {
+  number: PropTypes.number,
+  name: PropTypes.string,
+  onDelete: PropTypes.func,
+};
