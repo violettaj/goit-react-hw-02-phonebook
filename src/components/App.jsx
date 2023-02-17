@@ -14,13 +14,13 @@ export class App extends Component {
   addContact = ({ name, number }) => {
     const normalizationName = name.toLowerCase();
 
-    let atContactList = false;
-    this.state.contacts.forEach(item => {
-      if (item.name.toLocaleLowerCase() === normalizationName) {
-        alert(`${name} is already in contacts.`);
-        atContactList = true;
-      }
-    });
+    const atContactList = this.state.contacts.find(
+      ({ name }) => name.toLocaleLowerCase() === normalizationName
+    );
+    if (atContactList) {
+      alert(`${name} is already in contacts.`);
+      return;
+    }
 
     if (atContactList) {
       return;
